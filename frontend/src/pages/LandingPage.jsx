@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import AIFeatures from '../components/features/AIFeatures';
 import ContactForm from '../components/contact/ContactForm';
+import landingImage from '../assets/images/LandingPage.png';
 import {
   Box,
   Container,
@@ -295,7 +296,7 @@ const LandingPage = () => {
                 >
                   <Box 
                     component="img"
-                    src="/src/assets/images/LandingPage.png" // Add your image
+                    src={landingImage} // Add your image
                     alt="HR System Benefits"
                     sx={{ 
                       width: '100%',
