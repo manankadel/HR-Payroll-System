@@ -295,7 +295,7 @@ const LandingPage = () => {
                 >
                   <Box 
                     component="img"
-                    src="/path-to-your-image.png" // Add your image
+                    src="src/assets/images/LandingPage.png" // Add your image
                     alt="HR System Benefits"
                     sx={{ 
                       width: '100%',
