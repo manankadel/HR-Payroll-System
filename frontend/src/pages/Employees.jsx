@@ -21,7 +21,7 @@ import { employeeService } from '../services/api';
 
 const modalStyle = {
   position: 'absolute',
-  top: '50%',
+  top: '100%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
