@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Typography,
   Paper,
@@ -9,10 +9,13 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Alert
 } from '@mui/material';
+import { employeeService, payrollService } from '../services/api';
 
 const Payroll = () => {
+  const [employees, setEmployees] = useState([]);
   const [payrollData, setPayrollData] = useState({
     employee: '',
     month: '',
@@ -21,10 +24,32 @@ const Payroll = () => {
     allowances: '',
     deductions: ''
   });
+  const [calculationResult, setCalculationResult] = useState(null);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      const response = await employeeService.getAll();
+      setEmployees(response.data);
+    } catch (err) {
+      setError('Error fetching employees');
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Payroll calculation:', payrollData);
+    try {
+      const response = await payrollService.calculate(payrollData);
+      setCalculationResult(response.data);
+      setError('');
+    } catch (err) {
+      setError('Error calculating payroll');
+      setCalculationResult(null);
+    }
   };
 
   return (
@@ -32,6 +57,12 @@ const Payroll = () => {
       <Typography variant="h4" gutterBottom>
         Payroll Calculator
       </Typography>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
 
       <Paper sx={{ p: 3, mt: 3 }}>
         <form onSubmit={handleSubmit}>
@@ -43,8 +74,11 @@ const Payroll = () => {
                   value={payrollData.employee}
                   onChange={(e) => setPayrollData({ ...payrollData, employee: e.target.value })}
                 >
-                  <MenuItem value="1">John Doe</MenuItem>
-                  <MenuItem value="2">Jane Smith</MenuItem>
+                  {employees.map((emp) => (
+                    <MenuItem key={emp._id} value={emp._id}>
+                      {`${emp.firstName} ${emp.lastName}`}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
@@ -114,6 +148,42 @@ const Payroll = () => {
             </Grid>
           </Grid>
         </form>
+
+        {calculationResult && (
+          <Box sx={{ mt: 4 }}>
+            <Typography variant="h6" gutterBottom>
+              Calculation Result
+            </Typography>
+            <Paper sx={{ p: 2, bgcolor: 'grey.100' }}>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <Typography>Basic Salary:</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography>${calculationResult.basicSalary?.toLocaleString()}</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography>Allowances:</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography>${calculationResult.allowances?.toLocaleString()}</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography>Deductions:</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography>${calculationResult.deductions?.toLocaleString()}</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="h6">Net Salary:</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="h6">${calculationResult.netSalary?.toLocaleString()}</Typography>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Box>
+        )}
       </Paper>
     </div>
   );
