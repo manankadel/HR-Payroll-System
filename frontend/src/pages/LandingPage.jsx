@@ -46,9 +46,10 @@ const LandingPage = () => {
     try {
       const response = await authService.login(formData);
       dispatch(loginSuccess(response.data));
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
+    dispatch(loginFailure(err.response?.data?.message || 'Login failed'));
     } finally {
       setIsLoading(false);
     }

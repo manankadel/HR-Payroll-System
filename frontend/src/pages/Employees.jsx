@@ -14,14 +14,17 @@ import {
   TextField,
   Stack,
   Snackbar,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { employeeService } from '../services/api';
 
 const modalStyle = {
   position: 'absolute',
-  top: '100%',
+  top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
@@ -33,6 +36,7 @@ const modalStyle = {
 
 const Employees = () => {
   const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
@@ -51,10 +55,13 @@ const Employees = () => {
 
   const fetchEmployees = async () => {
     try {
+      setLoading(true);
       const response = await employeeService.getAll();
       setEmployees(response.data);
     } catch (error) {
       showSnackbar('Error fetching employees', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,6 +98,7 @@ const Employees = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       if (editingEmployee) {
         await employeeService.update(editingEmployee._id, newEmployee);
         showSnackbar('Employee updated successfully');
@@ -102,6 +110,8 @@ const Employees = () => {
       fetchEmployees();
     } catch (error) {
       showSnackbar(error.response?.data?.message || 'Error processing request', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -121,28 +131,60 @@ const Employees = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this employee?')) {
       try {
+        setLoading(true);
         await employeeService.delete(id);
         showSnackbar('Employee deleted successfully');
         fetchEmployees();
       } catch (error) {
         showSnackbar('Error deleting employee', 'error');
+      } finally {
+        setLoading(false);
       }
     }
   };
 
-  return (
-    <div>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4">Employees</Typography>
-        <Button 
-          variant="contained" 
-          startIcon={<AddIcon />} 
-          onClick={handleOpen}
-          sx={{ backgroundColor: '#1976d2' }}
-        >
-          Add Employee
-        </Button>
+  if (loading && employees.length === 0) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <CircularProgress />
       </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 3 }}>
+  <Box 
+    sx={{ 
+      display: 'flex', 
+      justifyContent: 'space-between', 
+      alignItems: 'center',
+      mb: 3 
+    }}
+  >
+    <Typography 
+      variant="h5" 
+      sx={{ 
+        fontWeight: 500,
+        color: '#1a1a1a' 
+      }}
+    >
+      Employees
+    </Typography>
+    <Button 
+      variant="contained" 
+      startIcon={<AddIcon />} 
+      onClick={handleOpen}
+      sx={{
+        bgcolor: '#2196f3',
+        '&:hover': {
+          bgcolor: '#1976d2'
+        },
+        height: '36px'
+      }}
+    >
+      Add Employee
+    </Button>
+  </Box>
 
       <TableContainer component={Paper}>
         <Table>
@@ -153,7 +195,7 @@ const Employees = () => {
               <TableCell>Department</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Salary</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -164,11 +206,12 @@ const Employees = () => {
                 <TableCell>{employee.department}</TableCell>
                 <TableCell>{employee.email}</TableCell>
                 <TableCell>${employee.salary?.toLocaleString()}</TableCell>
-                <TableCell>
+                <TableCell align="center">
                   <Button 
                     size="small" 
                     color="primary" 
                     onClick={() => handleEdit(employee)}
+                    startIcon={<EditIcon />}
                     sx={{ mr: 1 }}
                   >
                     Edit
@@ -177,6 +220,7 @@ const Employees = () => {
                     size="small" 
                     color="error"
                     onClick={() => handleDelete(employee._id)}
+                    startIcon={<DeleteIcon />}
                   >
                     Delete
                   </Button>
@@ -247,13 +291,20 @@ const Employees = () => {
                 onChange={handleInputChange}
                 fullWidth
                 required
+                InputProps={{ inputProps: { min: 0 } }}
               />
               <Button 
                 type="submit" 
                 variant="contained"
-                sx={{ backgroundColor: '#1976d2' }}
+                disabled={loading}
+                sx={{ 
+                  bgcolor: 'primary.main',
+                  '&:hover': {
+                    bgcolor: 'primary.dark',
+                  }
+                }}
               >
-                {editingEmployee ? 'Update Employee' : 'Add Employee'}
+                {loading ? 'Processing...' : (editingEmployee ? 'Update Employee' : 'Add Employee')}
               </Button>
             </Stack>
           </form>
@@ -268,11 +319,12 @@ const Employees = () => {
         <Alert 
           onClose={() => setSnackbar({ ...snackbar, open: false })} 
           severity={snackbar.severity}
+          sx={{ width: '100%' }}
         >
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </div>
+    </Box>
   );
 };
 

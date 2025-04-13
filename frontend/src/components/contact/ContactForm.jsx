@@ -1,165 +1,223 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import {
-  Box,
-  Container,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  Paper,
-  Snackbar,
-  Alert,
-  CircularProgress
-} from '@mui/material';
+import React, { useState } from 'react';
+import { TextField, Button, Box, Typography, Alert, CircularProgress } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import axios from 'axios';
+
+const StyledForm = styled('form')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(3),
+  maxWidth: '500px',
+  margin: '0 auto',
+  padding: theme.spacing(3),
+  backgroundColor: '#ffffff',
+  borderRadius: theme.spacing(1),
+  boxShadow: '0 3px 10px rgba(0, 0, 0, 0.2)',
+}));
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    company: '',
-    message: ''
+    subject: '',
+    message: '',
   });
-  
-  const [status, setStatus] = useState({
-    loading: false,
+
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState({
     success: false,
-    error: null
+    error: false,
+    message: '',
   });
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (formData.name.length < 2) {
+      newErrors.name = 'Name must be at least 2 characters long';
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    // Subject validation
+    if (!formData.subject.trim()) {
+      newErrors.subject = 'Subject is required';
+    }
+
+    // Message validation
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
+    } else if (formData.message.length < 10) {
+      newErrors.message = 'Message must be at least 10 characters long';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: '',
+      }));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus({ loading: true, success: false, error: null });
-  
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus({ success: false, error: false, message: '' });
+
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/contact/submit`,
-        formData
+        `${process.env.REACT_APP_API_URL}/api/contact`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
       );
-      setStatus({
-        loading: false,
-        success: true,
-        error: null
-      });
-      // Clear form
-      setFormData({
-        name: '',
-        email: '',
-        company: '',
-        message: ''
-      });
+
+      if (response.status === 200) {
+        setSubmitStatus({
+          success: true,
+          error: false,
+          message: 'Message sent successfully!',
+        });
+        // Clear form
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: '',
+        });
+      }
     } catch (error) {
-      setStatus({
-        loading: false,
+      setSubmitStatus({
         success: false,
-        error: error.response?.data?.message || 'Failed to send message'
+        error: true,
+        message: error.response?.data?.message || 'An error occurred. Please try again later.',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <Box sx={{ py: 8, bgcolor: 'grey.100' }}>
-      <Container maxWidth="md">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+    <Box sx={{ py: 4 }}>
+      <Typography variant="h4" align="center" gutterBottom>
+        Contact Us
+      </Typography>
+      
+      {(submitStatus.success || submitStatus.error) && (
+        <Alert 
+          severity={submitStatus.success ? "success" : "error"}
+          sx={{ mb: 2 }}
         >
-          <Typography variant="h2" align="center" gutterBottom>
-            Contact Us
-          </Typography>
-          <Typography variant="h6" align="center" color="text.secondary" sx={{ mb: 6 }}>
-            Have questions? We'd love to hear from you.
-          </Typography>
-        </motion.div>
+          {submitStatus.message}
+        </Alert>
+      )}
 
-        <Paper sx={{ p: 4, borderRadius: 2 }}>
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  disabled={status.loading}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                  disabled={status.loading}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Company"
-                  value={formData.company}
-                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  disabled={status.loading}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Message"
-                  multiline
-                  rows={4}
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  required
-                  disabled={status.loading}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  fullWidth
-                  disabled={status.loading}
-                  sx={{
-                    height: 48,
-                    background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                    '&:hover': {
-                      background: 'linear-gradient(45deg, #1976D2 30%, #2196F3 90%)',
-                    }
-                  }}
-                >
-                  {status.loading ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : (
-                    'Send Message'
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </Paper>
+      <StyledForm onSubmit={handleSubmit}>
+        <TextField
+          name="name"
+          label="Name"
+          value={formData.name}
+          onChange={handleChange}
+          error={!!errors.name}
+          helperText={errors.name}
+          fullWidth
+          required
+        />
 
-        <Snackbar
-          open={status.success || !!status.error}
-          autoHideDuration={6000}
-          onClose={() => setStatus({ ...status, success: false, error: null })}
+        <TextField
+          name="email"
+          label="Email"
+          type="email"
+          value={formData.email}
+          onChange={handleChange}
+          error={!!errors.email}
+          helperText={errors.email}
+          fullWidth
+          required
+        />
+
+        <TextField
+          name="subject"
+          label="Subject"
+          value={formData.subject}
+          onChange={handleChange}
+          error={!!errors.subject}
+          helperText={errors.subject}
+          fullWidth
+          required
+        />
+
+        <TextField
+          name="message"
+          label="Message"
+          multiline
+          rows={4}
+          value={formData.message}
+          onChange={handleChange}
+          error={!!errors.message}
+          helperText={errors.message}
+          fullWidth
+          required
+        />
+
+        <Button 
+          type="submit" 
+          variant="contained" 
+          color="primary"
+          disabled={isSubmitting}
+          sx={{ 
+            py: 1.5,
+            position: 'relative',
+          }}
         >
-          <Alert
-            severity={status.success ? 'success' : 'error'}
-            onClose={() => setStatus({ ...status, success: false, error: null })}
-          >
-            {status.success
-              ? 'Message sent successfully!'
-              : status.error || 'Failed to send message'}
-          </Alert>
-        </Snackbar>
-      </Container>
+          {isSubmitting ? (
+            <>
+              <CircularProgress
+                size={24}
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-12px',
+                  marginLeft: '-12px',
+                }}
+              />
+              Sending...
+            </>
+          ) : (
+            'Send Message'
+          )}
+        </Button>
+      </StyledForm>
     </Box>
   );
 };

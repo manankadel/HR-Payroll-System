@@ -1,97 +1,239 @@
+import React, { useState, useEffect } from 'react';
 import {
   AppBar,
-  Toolbar,
-  Typography,
-  Button,
   Box,
-  Container,
+  Toolbar,
   IconButton,
-  Tooltip
+  Typography,
+  Menu,
+  Container,
+  Avatar,
+  Button,
+  Tooltip,
+  MenuItem,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
 } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import LogoutIcon from '@mui/icons-material/Logout';
-import { logout } from '../../store/slices/authSlice';
+import {
+  Menu as MenuIcon,
+  Dashboard,
+  People,
+  Payment,
+  Logout,
+} from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from "../../store/slices/authSlice";
 
 const Navbar = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
+  const pages = [
+    { title: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
+    { title: 'Employees', path: '/employees', icon: <People /> },
+    { title: 'Payroll', path: '/payroll', icon: <Payment /> },
+  ];
+
+  const userMenuItems = [
+    { title: 'Logout', icon: <Logout />, action: handleLogout },
+  ];
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 20;
+      setScrolled(isScrolled);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleOpenNavMenu = (event) => {
+    setAnchorElNav(event.currentTarget);
   };
+
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  async function handleLogout() {
+    try {
+      await dispatch(logout());
+      navigate('/', { replace: true });
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  }
+
+  const drawer = (
+    <Box sx={{ width: 250 }}>
+      <List>
+        {pages.map((page) => (
+          <ListItem
+            button
+            key={page.title}
+            onClick={() => {
+              navigate(page.path);
+              setMobileOpen(false);
+            }}
+          >
+            <ListItemIcon>{page.icon}</ListItemIcon>
+            <ListItemText primary={page.title} />
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
 
   return (
     <AppBar 
       position="fixed" 
-      sx={{ 
-        bgcolor: 'white',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      sx={{
+        width: '240px',
+        height: '100vh',
+        backgroundColor: '#2196f3',
+        boxShadow: 'none',
+        left: 0, // Ensure it's on the left
+    right: 'auto', 
       }}
     >
-      <Container maxWidth="lg">
+      <Container 
+        sx={{ 
+          height: '100%',
+          padding: '16px 0',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <Toolbar 
+          disableGutters 
           sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between',
-            padding: { xs: '0 16px', sm: '0 24px' }
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            width: '100%',
+            height: 'auto',
           }}
         >
-          <Typography 
-            variant="h6" 
-            component={Link} 
-            to="/" 
-            sx={{ 
-              color: 'primary.main',
-              textDecoration: 'none',
-              fontWeight: 600
+          {/* Logo */}
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{
+              mb: 4,
+              fontWeight: 700,
+              color: 'white',
+              cursor: 'pointer',
+              pl: 2
             }}
+            onClick={() => navigate('/dashboard')}
           >
-            HR Payroll System
+            HR PAYROLL
           </Typography>
-          
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Button 
-              color="primary" 
-              component={Link} 
-              to="/"
-              sx={{ fontWeight: 500 }}
-            >
-              Dashboard
-            </Button>
-            <Button 
-              color="primary" 
-              component={Link} 
-              to="/employees"
-              sx={{ fontWeight: 500 }}
-            >
-              Employees
-            </Button>
-            <Button 
-              color="primary" 
-              component={Link} 
-              to="/payroll"
-              sx={{ fontWeight: 500 }}
-            >
-              Payroll
-            </Button>
-            <Tooltip title="Logout">
-              <IconButton 
-                onClick={handleLogout}
-                sx={{ 
-                  ml: 1,
-                  color: 'primary.main',
+
+          {/* Navigation Items */}
+          <Box sx={{ width: '100%', mb: 2 }}>
+            {isAuthenticated && pages.map((page) => (
+              <Button
+                key={page.title}
+                onClick={() => navigate(page.path)}
+                sx={{
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  width: '100%',
+                  justifyContent: 'flex-start',
+                  py: 1.5,
+                  px: 2,
                   '&:hover': {
-                    bgcolor: 'primary.light',
-                    color: 'primary.dark'
-                  }
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  },
                 }}
               >
-                <LogoutIcon />
-              </IconButton>
-            </Tooltip>
+                {page.icon}
+                {page.title}
+              </Button>
+            ))}
           </Box>
+
+          {/* Mobile menu */}
+          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size="large"
+              aria-label="menu"
+              onClick={handleDrawerToggle}
+              color="inherit"
+            >
+              <MenuIcon />
+            </IconButton>
+            <Drawer
+              variant="temporary"
+              anchor="left"
+              open={mobileOpen}
+              onClose={handleDrawerToggle}
+              ModalProps={{
+                keepMounted: true,
+              }}
+            >
+              {drawer}
+            </Drawer>
+          </Box>
+
+          {/* User menu at bottom */}
+          {isAuthenticated ? (
+            <Box sx={{ mt: 'auto', width: '100%' }}>
+              <Button
+                onClick={handleLogout}
+                sx={{
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  width: '100%',
+                  justifyContent: 'flex-start',
+                  py: 1.5,
+                  px: 2,
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
+              >
+                <Logout />
+                Logout
+              </Button>
+            </Box>
+          ) : (
+            <Button
+              color="inherit"
+              onClick={() => navigate('/')}
+              sx={{ mt: 'auto' }}
+            >
+              Login
+            </Button>
+          )}
         </Toolbar>
       </Container>
     </AppBar>
