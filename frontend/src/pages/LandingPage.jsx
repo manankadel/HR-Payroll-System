@@ -377,7 +377,7 @@ const LandingPage = () => {
       <Box sx={{ bgcolor: 'grey.900', color: 'white', py: 4 }}>
         <Container>
           <Typography variant="body2" align="center">
-            © {new Date().getFullYear()} HR Payroll System. All rights reserved.
+            © {new Date().getFullYear()} Blueblood Solutions. All rights reserved.
           </Typography>
         </Container>
       </Box>

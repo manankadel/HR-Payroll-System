@@ -40,7 +40,8 @@ export const employeeService = {
   getById: (id) => api.get(`/employees/${id}`),
   create: (employeeData) => api.post('/employees', employeeData),
   update: (id, employeeData) => api.put(`/employees/${id}`, employeeData),
-  delete: (id) => api.delete(`/employees/${id}`)
+  delete: (id) => api.delete(`/employees/${id}`),
+  getDepartmentStats: () => api.get('/employees/department-stats')
 };
 
 export const payrollService = {
