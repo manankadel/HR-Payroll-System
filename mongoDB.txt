@@ -1,3 +1,0 @@
-username - admin
-pass - 12345677@Ab
-email - @mk1558

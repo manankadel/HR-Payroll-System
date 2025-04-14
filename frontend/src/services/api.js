@@ -44,6 +44,17 @@ export const employeeService = {
   getDepartmentStats: () => api.get('/employees/department-stats')
 };
 
+export const leaveService = {
+  apply: (leaveData) => api.post('/leaves/apply', leaveData),
+  getAll: () => api.get('/leaves'),
+  getEmployeeLeaves: (employeeId) => api.get(`/leaves/employee/${employeeId}`),
+  updateStatus: (leaveId, statusData) => api.put(`/leaves/${leaveId}/status`, statusData),
+  getBalance: (employeeId) => api.get(`/leaves/balance/${employeeId}`),
+  getTopTakers: () => api.get('/leaves/top-takers'),
+  getCalendarEvents: (startDate, endDate) => 
+    api.get(`/leaves/calendar?startDate=${startDate}&endDate=${endDate}`)
+};
+
 export const payrollService = {
   calculate: (payrollData) => api.post('/payroll/calculate', payrollData),
   getHistory: () => api.get('/payroll/history')

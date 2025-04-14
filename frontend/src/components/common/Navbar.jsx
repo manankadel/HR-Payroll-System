@@ -27,6 +27,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from "../../store/slices/authSlice";
+import { EventNote } from '@mui/icons-material';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ const Navbar = () => {
     { title: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
     { title: 'Employees', path: '/employees', icon: <People /> },
     { title: 'Payroll', path: '/payroll', icon: <Payment /> },
+    { title: 'Leaves', path: '/leaves', icon: <EventNote /> },
   ];
 
   const userMenuItems = [

@@ -1,0 +1,7 @@
+username - admin
+pass - 12345677@Ab
+email - @mk1558
+
+git push
+git add .
+git commit -m "LayoutChanges"

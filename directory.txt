@@ -1,0 +1,76 @@
+HR Payroll Software/
+├── backend/
+│   ├── node_modules/
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── db.js
+│   │   ├── controllers/
+│   │   │   ├── authController.js
+│   │   │   ├── contactController.js
+│   │   │   ├── employeeController.js
+│   │   │   └── payrollController.js
+│   │   ├── middleware/
+│   │   │   ├── auth.js
+│   │   │   └── errorHandler.js
+│   │   ├── models/
+│   │   │   ├── Employee.js
+│   │   │   ├── Payroll.js
+│   │   │   └── User.js
+│   │   ├── routes/
+│   │   │   ├── authRoutes.js
+│   │   │   ├── contactRoutes.js
+│   │   │   ├── employeeRoutes.js
+│   │   │   └── payrollRoutes.js
+│   │   └── services/
+│   │       └── emailService.js
+│   ├── .env
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── procfile
+│   └── server.js
+│
+├── frontend/
+│   ├── node_modules/
+│   ├── public/
+│   │   └── vite.svg
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   │   ├── common/
+│   │   │   │   ├── Layout.jsx
+│   │   │   │   ├── Navbar.jsx
+│   │   │   │   └── ProtectedRoute.jsx
+│   │   │   ├── contact/
+│   │   │   │   └── ContactForm.jsx
+│   │   │   ├── Dashboard/
+│   │   │   ├── Employees/
+│   │   │   ├── features/
+│   │   │   │   └── AIFeatures.jsx
+│   │   │   └── Payroll/
+│   │   ├── pages/
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Employees.jsx
+│   │   │   ├── LandingPage.jsx
+│   │   │   └── Payroll.jsx
+│   │   ├── services/
+│   │   │   ├── aiService.js
+│   │   │   └── api.js
+│   │   ├── store/
+│   │   │   ├── slices/
+│   │   │   │   └── authSlice.js
+│   │   │   └── index.js
+│   │   ├── theme/
+│   │   │   └── index.js
+│   │   ├── utils/
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
+│   ├── .env
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── README.md
+│   └── vite.config.js

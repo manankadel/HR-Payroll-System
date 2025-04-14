@@ -279,6 +279,14 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                    <Route
+  path="/leaves"
+  element={
+    <ProtectedRoute>
+      <Leaves />
+    </ProtectedRoute>
+  }
+/>
                   <Route
                     path="/payroll"
                     element={

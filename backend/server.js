@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const connectDB = require('./src/config/db');
 const errorHandler = require('./src/middleware/errorHandler');
 const contactRoutes = require('./routes/contactRoutes');
+const leaveRoutes = require('./routes/leaveRoutes');
+app.use('/api/leaves', leaveRoutes);
 app.use('/api/contact', contactRoutes);
 
 // Load environment variables
