@@ -40,8 +40,10 @@ import { format, parse, startOfWeek, getDay } from 'date-fns';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { leaveService } from '../services/api';
 
+import { enUS } from 'date-fns/locale';
+
 const locales = {
-  'en-US': require('date-fns/locale/en-US')
+  'en-US': enUS
 };
 
 const localizer = dateFnsLocalizer({

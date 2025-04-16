@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
 import { Provider } from 'react-redux';
 import { createContext, useState } from 'react';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import store from './store';
 import Layout from './components/common/Layout';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -9,6 +11,9 @@ import Dashboard from './pages/Dashboard';
 import Employees from './pages/Employees';
 import Payroll from './pages/Payroll';
 import LandingPage from './pages/LandingPage';
+import Leaves from './pages/Leaves';
+
+
 
 export const ThemeContext = createContext();
 export const NotificationContext = createContext();
@@ -258,47 +263,49 @@ function App() {
     <Provider store={store}>
       <ThemeContext.Provider value={themeContextValue}>
         <NotificationContext.Provider value={notificationContextValue}>
-          <ThemeProvider theme={theme}>
-            <Router>
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route element={<Layout />}>
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/employees"
-                    element={
-                      <ProtectedRoute>
-                        <Employees />
-                      </ProtectedRoute>
-                    }
-                  />
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <ThemeProvider theme={theme}>
+              <Router>
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route element={<Layout />}>
                     <Route
-  path="/leaves"
-  element={
-    <ProtectedRoute>
-      <Leaves />
-    </ProtectedRoute>
-  }
-/>
-                  <Route
-                    path="/payroll"
-                    element={
-                      <ProtectedRoute>
-                        <Payroll />
-                      </ProtectedRoute>
-                    }
-                  />
-                </Route>
-              </Routes>
-            </Router>
-          </ThemeProvider>
+                      path="/dashboard"
+                      element={
+                        <ProtectedRoute>
+                          <Dashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/employees"
+                      element={
+                        <ProtectedRoute>
+                          <Employees />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/payroll"
+                      element={
+                        <ProtectedRoute>
+                          <Payroll />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/leaves"
+                      element={
+                        <ProtectedRoute>
+                          <Leaves />
+                        </ProtectedRoute>
+                      }
+                    />
+                  </Route>
+                </Routes>
+              </Router>
+            </ThemeProvider>
+          </LocalizationProvider>
         </NotificationContext.Provider>
       </ThemeContext.Provider>
     </Provider>

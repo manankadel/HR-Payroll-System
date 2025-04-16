@@ -48,8 +48,8 @@ export const leaveService = {
   apply: (leaveData) => api.post('/leaves/apply', leaveData),
   getAll: () => api.get('/leaves'),
   getEmployeeLeaves: (employeeId) => api.get(`/leaves/employee/${employeeId}`),
-  updateStatus: (leaveId, statusData) => api.put(`/leaves/${leaveId}/status`, statusData),
   getBalance: (employeeId) => api.get(`/leaves/balance/${employeeId}`),
+  updateStatus: (id, statusData) => api.put(`/leaves/${id}/status`, statusData),
   getTopTakers: () => api.get('/leaves/top-takers'),
   getCalendarEvents: (startDate, endDate) => 
     api.get(`/leaves/calendar?startDate=${startDate}&endDate=${endDate}`)
